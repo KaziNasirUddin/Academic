@@ -1,0 +1,13 @@
+﻿  Library Management.c
+e:\works\library management\library management\library management.c(121): warning C4013: 'gets' undefined; assuming extern returning int
+e:\works\library management\library management\library management.c(157): warning C4013: 'HELP_FOR_ADMIN' undefined; assuming extern returning int
+e:\works\library management\library management\library management.c(217): warning C4013: 'HELP_FOR_STUDENT' undefined; assuming extern returning int
+e:\works\library management\library management\library management.c(1156): warning C4474: 'printf' : too many arguments passed for format string
+  e:\works\library management\library management\library management.c(1156): note: placeholders and their parameters expect 4 variadic arguments, but 5 were provided
+e:\works\library management\library management\library management.c(1183): warning C4474: 'printf' : too many arguments passed for format string
+  e:\works\library management\library management\library management.c(1183): note: placeholders and their parameters expect 4 variadic arguments, but 5 were provided
+e:\works\library management\library management\library management.c(1325): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+e:\works\library management\library management\library management.c(1339): warning C4047: '=': 'char' differs in levels of indirection from 'void *'
+e:\works\library management\library management\library management.c(1311): warning C4101: 'GARVEZ_STRING': unreferenced local variable
+e:\works\library management\library management\library management.c(812): warning C4717: 'SEARCH_BOOK': recursive on all control paths, function will cause runtime stack overflow
+  Library Management.vcxproj -> E:\Works\Library Management\Debug\Library Management.exe
