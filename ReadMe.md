@@ -1,8 +1,8 @@
 Problem statement
 
 In mini library management system, the library personnel need to find a book for the customer. 
-	1. There will be so many books with the same author and the library personnel need to find using alphabetical order.
-	2. The personnel need to check out few books, and at the same time to record any books being returned by the end as well as to keep track the customer’s information.  This process of searching can be time consuming. 
+1. There will be so many books with the same author and the library personnel need to find using alphabetical order.
+2. The personnel need to check out few books, and at the same time to record any books being returned by the end as well as to keep track the customer’s information.  This process of searching can be time consuming. 
 
 Task
 
