@@ -17,7 +17,7 @@ Create more advance functions to help the library personnel based on the followi
 8. Include a menu that allows the customer to choose the operation that the customer wants to perform.
 9. To calculate return balance based on amount paid by the customer.
 10. To provide reporting function like shown in Figure 2.
-11.You are encouraged to use your own creativity and ideas to add functionalities to make your system as functional and user-friendly a possible. For example, you may incorporate borrowed date and returned date to compute the number of days a customer borrows an item.
+11. You are encouraged to use your own creativity and ideas to add functionalities to make your system as functional and user-friendly a possible. For example, you may incorporate borrowed date and returned date to compute the number of days a customer borrows an item.
 12. Hence, your program should focus on the topics below Array, Pointer, Basic data structures, File processing 
 
 Table 1: Overdue/late returns/ penalty fine rates
