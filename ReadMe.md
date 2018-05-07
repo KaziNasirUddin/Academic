@@ -18,9 +18,8 @@ Create more advance functions to help the library personnel based on the followi
 9. To calculate return balance based on amount paid by the customer.
 10. To provide reporting function like shown in Figure 2.
 
-
 Table 1: Overdue/late returns/ penalty fine rates
-|**ITEMS**|**RATES****(incurred after due date or hour)**|
+|**ITEMS**|**RATES**(incurred after due date or hour)|
 | --- | --- |
 |General Loan Books|RM 0.20 per day|
 |Red-spot(text books & recommended readings by Course/Program)|RM 0.20 per hour|
