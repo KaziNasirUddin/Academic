@@ -20,50 +20,11 @@ Create more advance functions to help the library personnel based on the followi
 
 
 Table 1: Overdue/late returns/ penalty fine rates
-|
-
-**ITEMS**
-
- |
-
-**RATES**
-
-**(incurred after due date or hour)**
-
- |
+|**ITEMS**|**RATES****(incurred after due date or hour)**|
 | --- | --- |
-|
-
-General Loan Books
-
- |
-
-RM 0.20 per day
-
- |
-|
-
-Red-spot
-
-(text books & recommended readings by Course/Program)
-
- |
-
-RM 0.20 per hour
-
- |
-|
-
-Lost **ONE (1)** book
-
-**applied only for books not being returned to the library for 12 months, starting from the date it has been borrowed*
-
- |
-
-RM50.00
-
- |
-
+|General Loan Books|RM 0.20 per day|
+|Red-spot(text books & recommended readings by Course/Program)|RM 0.20 per hour|
+|Lost **ONE (1)** book**applied only for books not being returned to the library for 12 months, starting from the date it has been borrowed*|RM50.00|
 
 
 
