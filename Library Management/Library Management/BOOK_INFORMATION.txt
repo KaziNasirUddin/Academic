@@ -1,2 +1,2 @@
-	A1-2	Sapiens		Harari		10		NO
-	A1-3	How to Win Friends		D. Thomas		20		NO
+A1-1|Sapiens|Harari A|20|NO
+A1-2|How to Win Friends|New Author|30|No
