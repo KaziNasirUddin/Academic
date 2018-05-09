@@ -1,2 +1,1 @@
-A1-1|Sapiens|Harari A|20|NO
-A1-2|How to Win Friends|New Author|30|No
+B-5|Name|AuthName|10|NO
