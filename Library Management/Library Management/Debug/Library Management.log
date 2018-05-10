@@ -1,5 +1,1 @@
-﻿  Source.c
-c:\users\gadgets planet\desktop\github\academic\library management\library management\source.c(92): warning C4033: 'GetUniqueIDFromFile' must return a value
-c:\users\gadgets planet\desktop\github\academic\library management\library management\source.c(101): warning C4033: 'GetUniqueIDFromFile' must return a value
-c:\users\gadgets planet\desktop\github\academic\library management\library management\source.c(106): warning C4715: 'GetUniqueIDFromFile': not all control paths return a value
-  Library Management.vcxproj -> C:\Users\Gadgets Planet\Desktop\GitHub\Academic\Library Management\Debug\Library Management.exe
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\VC\VCTargets\Microsoft.CppClean.targets(76,5): warning : Access to the path 'e:\works\library management\debug\library management.exe' is denied.

@@ -12,6 +12,7 @@
 #define USER_ID_FILE "UNIQUE_ID_USER.txt"
 #define LOGIN_ATTEMPT 3
 
+int IsAdmin = 0;
 
 #pragma region Structures
 typedef struct Book {
@@ -37,7 +38,9 @@ int NumberOfUsers;
 #pragma endregion Structures
 
 #pragma region Prototypes
-int GetUniqueIDFromFile(const char* fileName);
+int GetUniqueIDFromFile(const char*);
+void PrintChar(char, int);
+void PrintLine(const char*);
 void ReadBooksFromFile();
 void WriteBooksToFile();
 Book* SearchBook(const char*);
@@ -45,40 +48,32 @@ void AddBook(Book);
 void EditBook(const char*, const char*, const char*, const char*, const char*);
 void DeleteBook(const char*);
 void WriteBookContent(FILE*, Book);
-int GetUniqueIDForBook();
+char* GetUniqueIDForBook();
+void PrintBookHeader();
+void PrintBook(Book);
+Book InputBook();
 
 void ReadUsersFromFile();
 void WriteUsersToFile();
 void AddUser(User);
-User* SearchUser(const char* id);
+User* SearchUser(const char*);
+User* SearchUserByName(const char*);
 void WriteUserContent(FILE*, User);
 void EditUser(const char*, const char*, const char*, const char*, const char*);
 void DeleteUser(const char*);
-int GetUniqueIDForUser();
+char* GetUniqueIDForUser();
+void PrintUserHeader();
+void PrintUser(User);
 void userLogin(int );
 #pragma endregion Prototypes
 
 int main()
 {
-
-	ReadUsersFromFile();
-	ReadBooksFromFile();
-	/*User u = { "a", "User", "pass", "A", "0" };
-	char seq[3];
-	int id = GetUniqueIDForUser();
-	itoa(id, seq, 10);
-	strcpy(u.id, "U-");
-	strcat(u.id, seq);*/
-	Book b = { "a", "Name", "AuthName", "10", "NO" };
-	char seq[3];
-	int id = GetUniqueIDForUser();
-	itoa(id, seq, 10);
-	strcpy(b.id, "B-");
-	strcat(b.id, seq);
-	
-	AddBook(b);
-	/*int loginAttempRemaining = LOGIN_ATTEMPT;
-	userLogin(loginAttempRemaining);*/
+	PrintLine("WELCOME TO LIBRARY MANAGEMENT");
+	PrintLine("-----------------------------");
+	int loginAttempRemaining = LOGIN_ATTEMPT;
+	userLogin(loginAttempRemaining);
+	getchar();
 	return 0;
 }
 
@@ -104,8 +99,17 @@ int GetUniqueIDFromFile(const char* fileName)
 	fclose(f);
 	return id;
 }
-
-
+void PrintChar(char c, int times)
+{
+	while (times--)
+	{
+		printf("%c", c);
+	}
+}
+void PrintLine(const char* s)
+{
+	printf("\n\t\t%s\n", s);
+}
 #pragma region Book Functions
 void ReadBooksFromFile()
 {
@@ -186,13 +190,13 @@ void AddBook(Book b)
 	FILE* bookFile = fopen(BOOK_DATABASE, "a");
 	if (!bookFile)
 	{
-		printf("Book Database not found");
+		PrintLine("BOOK DATABASE NOT FOUND");
 		return;
 	}
 	WriteBookContent(bookFile, b);
-	NumberOfBooks++;
+	books[NumberOfBooks++] = b;
 	fclose(bookFile);
-	printf("Book Added Successfully");
+	PrintLine("BOOK ADDED SUCCESSFULLY");
 }
 
 Book* SearchBook(const char* id)
@@ -213,7 +217,7 @@ void EditBook(const char* id, const char* name, const char* authorName, const ch
 	Book* b = SearchBook(id);
 	if (b == NULL)
 	{
-		printf("Book not found");
+		PrintLine("BOOK NOT FOUND");
 	}
 	else
 	{
@@ -222,7 +226,7 @@ void EditBook(const char* id, const char* name, const char* authorName, const ch
 		if (strlen(price)) strcpy(b->price, price);
 		if (strlen(issue)) strcpy(b->issue, issue);
 		WriteBooksToFile();
-		printf("Book Updated");
+		PrintLine("BOOK UPDATED SUCCESSFULLY");
 	}
 }
 
@@ -239,21 +243,67 @@ void DeleteBook(const char* id)
 	}
 	if (index == -1)
 	{
-		printf("Book not found");
+		PrintLine("BOOK NOT FOUND");
 		return;
 	}
 	for (int i = index + 1; i < NumberOfBooks; i++)
 	{
-		books[i] = books[i + 1];
+		books[i - 1] = books[i];
 	}
 	NumberOfBooks--;
 	WriteBooksToFile();
-	printf("Book successfully deleted");
+	PrintLine("BOOK DELETED SUCCESSFULLY");
 }
 
-int GetUniqueIDForBook()
+char* GetUniqueIDForBook()
 {
-	return GetUniqueIDFromFile(BOOK_ID_FILE);
+	char id[10];
+	char seq[3];
+	int num = GetUniqueIDFromFile(BOOK_ID_FILE);
+	itoa(num, seq, 10);
+	strcpy(id, "B-");
+	strcat(id, seq);
+	return id;
+}
+
+void PrintBookHeader()
+{
+	printf("%s","ID");
+	PrintChar(' ', 7);
+	printf("%s", "NAME");
+	PrintChar(' ', 20);
+	printf("%s", "AUTHOR");
+	PrintChar(' ', 18);
+	printf("%s", "PRICE");
+	PrintChar(' ', 1);
+	printf("%s", "ISSUE\n");
+	PrintChar('-', 68);
+	printf("%s", "\n");
+}
+
+void PrintBook(Book b)
+{
+	printf("%-9s", b.id);
+	printf("%-24s", b.name);
+	printf("%-24s", b.authorName);
+	printf("%-6s", b.price);
+	printf("%s\n", b.issue);
+}
+
+Book InputBook()
+{
+	Book b;
+	printf("\n\t\tENTER BOOK NAME: ");
+	scanf("%[^\n]%*c", b.name);
+	strcat(b.name, "\0");
+	printf("\n\t\tENTER AUTHOR NAME: ");
+	scanf("%[^\n]%*c", b.authorName);
+	strcat(b.authorName, "\0");
+	printf("\n\t\tENTER PRICE: ");
+	scanf("%[^\n]%*c", b.price);
+	strcat(b.price, "\0");
+	strcpy(b.issue, "NO");
+	return b;
 }
 
 #pragma endregion Book Functions
@@ -315,6 +365,19 @@ User* SearchUser(const char* id)
 	for (int i = 0; i < NumberOfUsers; i++)
 	{
 		if (strcmp(id, users[i].id) == 0)
+		{
+			return &users[i];
+		}
+	}
+	return NULL;
+}
+
+User* SearchUserByName(const char* name)
+{
+	int found = 0;
+	for (int i = 0; i < NumberOfUsers; i++)
+	{
+		if (strcmp(name, users[i].userName) == 0)
 		{
 			return &users[i];
 		}
@@ -402,32 +465,296 @@ void WriteUserContent(FILE* userFile, User u)
 	fprintf(userFile, "%c", '\n');
 }
 
-int GetUniqueIDForUser()
+char* GetUniqueIDForUser()
 {
-	return GetUniqueIDFromFile(USER_ID_FILE);
+	char id[10];
+	char seq[3];
+	int num = GetUniqueIDFromFile(USER_ID_FILE);
+	itoa(num, seq, 10);
+	strcpy(id, "U-");
+	strcat(id, seq);
+	return id;
+}
+
+void PrintUserHeader()
+{
+	printf("%s", "ID");
+	PrintChar(' ', 7);
+	printf("%s", "NAME");
+	PrintChar(' ', 15);
+	printf("%s", "PASSWORD");
+	PrintChar(' ', 7);
+	printf("%s", "TYPE");
+	PrintChar(' ', 1);
+	printf("%s", "BORROW_STATUS\n");
+	PrintChar('-', 61);
+	printf("%s", "\n");
+}
+
+void PrintUser(User u)
+{
+	printf("%-9s", u.id);
+	printf("%-19s", u.userName);
+	printf("%-15s", u.password);
+	printf("%-5s", u.type);
+	printf("%s\n", u.borrowStatus);
 }
 #pragma endregion User Functions
 
+int GetAdminCommands() {
+
+	char command[25];
+	printf("\n\t\tADMIN COMMAND: ");
+	gets(command);
+	if (strcmp(strupr(command), "ADD_BOOK") == 0) 
+	{
+		Book b = InputBook();
+		strcpy(b.id, GetUniqueIDForBook());
+		AddBook(b);
+	}
+	else if (strcmp(strupr(command), "DELETE_BOOK") == 0) 
+	{
+		char* id[10];
+		printf("\n\t\tENTER BOOK ID: ");
+		scanf("%s", id);
+		DeleteBook(id);
+		
+	}
+	else if (strcmp(strupr(command), "EDIT_BOOK") == 0)
+	{
+		char id[10];
+		printf("\n\t\tENTER BOOK ID: ");
+		scanf("%[^\n]%*c", id);
+		Book b = InputBook();
+		EditBook(id, b.name, b.authorName, b.price, b.issue);
+	}
+	else if (strcmp(strupr(command), "BORROW_BOOK") == 0) 
+	{
+		char bookId[10]; //todo: Input Book Id
+		char userId[10]; //todo: Input User Id
+		//todo: BorrowBook(); 
+	}
+	else if (strcmp(strupr(command), "VIEW_BOOK") == 0) 
+	{
+		PrintBookHeader();
+		ReadBooksFromFile();
+		for (int i = 0; i < NumberOfBooks; i++)
+		{
+			PrintBook(books[i]);
+		}
+	}
+	else if (strcmp(strupr(command), "SEARCH_BOOK") == 0) 
+	{
+		//todo: Input Book Id
+		//SearchBook()
+	}
+	else if (strcmp(strupr(command), "LOG_OUT") == 0) 
+	{
+		//todo:
+		LOG_OUT();
+	}
+	else if (strcmp(strupr(command), "RETURN_BOOK") == 0) 
+	{
+		//todo:
+		RETURN_BOOK();
+	}
+	else if (strcmp(strupr(command), "HELP") == 0) 
+	{
+		//todo:
+		HELP_FOR_ADMIN();
+	}
+	else if (strcmp(strupr(command), "CLEAR") == 0) 
+	{
+		//todo:
+		CLEAR();
+	}
+	else if (strcmp(strupr(command), "RESTART") == 0) 
+	{
+		//todo:
+		RESTART();
+	}
+	/*else if (strcmp(strupr(command), "CHANGE_USER_NAME") == 0) 
+	{
+
+		CHANGE_USER_NAME();
+	}
+	else if (strcmp(strupr(command), "CHANGE_PASSWORD") == 0) 
+	{
+
+		CHANGE_PASSWORD();
+	}*/
+	else if (strcmp(strupr(command), "VIEW_PROFILE") == 0) 
+	{
+		//todo:
+		//VIEW_PROFILE();
+	}
+	else if (strcmp(strupr(command), "ADD_USER") == 0) 
+	{
+		//todo:
+		//ADD_USER();
+	}
+	else {
+
+		printf("\n\t\t\tMAKE SURE YOU WRITE THE CORRECT ONE.\n\a\a");
+		//COMMAND(IS_ADMIMN_OR_STUDENT);
+	}
+
+	return 0;
+}
+int GetStudentCommands() {
+
+	char command[25];
+
+	printf("\n\n\nCOMMAND: ");
+	gets(command);
+
+	if (strcmp(strupr(command), "VIEW_BOOK") == 0) 
+	{
+
+		VIEW_BOOK();
+	}
+	else if (strcmp(strupr(command), "SEARCH_BOOK") == 0) 
+	{
+
+		SEARCH_BOOK();
+	}
+	else if (strcmp(strupr(command), "LOG_OUT") == 0) 
+	{
+
+		LOG_OUT();
+	}
+	/*else if(strcmp(strupr(command),"RETURN_BOOK") == 0){
+
+	RETURN_BOOK();
+	}*/
+	else if (strcmp(strupr(command), "HELP") == 0) 
+	{
+		HELP_FOR_STUDENT();
+	}
+	else if (strcmp(strupr(command), "CLEAR") == 0) 
+	{
+		CLEAR();
+	}
+	else if (strcmp(strupr(command), "CHANGE_USER_NAME") == 0) 
+	{
+		CHANGE_USER_NAME();
+	}
+	else if (strcmp(strupr(command), "CHANGE_PASSWORD") == 0) 
+	{
+
+		CHANGE_PASSWORD();
+	}
+	else if (strcmp(strupr(command), "MY_PROFILE") == 0) 
+	{
+
+		MY_PROFILE();
+	}
+	else 
+	{
+		printf("\n\t\t\tMAKE SURE YOU WRITE THE CORRECT ONE.\n\a\a");
+		GetCommands(IsAdmin);
+	}
+
+	return 0;
+}
+int GetCommands(int isAdmin) 
+{
+	if (isAdmin) 
+	{
+		GetAdminCommands();
+	}
+	else 
+	{
+		GetStudentCommands();
+	}
+	return 0;
+}
+int GetAdminHelp () 
+{
+	printf("\n\t\t*ENTER ADD_BOOK FOR ADDING BOOK.*\n");
+	printf("\n\t\t*ENTER DELETE_BOOK FOR DELETING BOOK.*\n");
+	printf("\n\t\t*ENTER EDIT_BOOK FOR EIDITING BOOK.*\n");
+	printf("\n\t\t*ENTER BORROW_BOOK FOR BORROW BOOK.*\n");
+	printf("\n\t\t*ENTER VIEW_BOOK FOR VIEWING BOOK.*\n");
+	printf("\n\t\t*ENTER SEARCH_BOOK FOR SEARCHING BOOK.*\n");
+	printf("\n\t\t*ENTER RETURN_BOOK FOR RETURNING BOOK.*\n");
+	printf("\n\t\t*ENTER LOG_OUT FOR LOGING OUT.*\n");
+	printf("\n\t\t*ENTER CLEAR FOR CLEANING CONSOL.*\n");
+	printf("\n\t\t*ENTER RESTART FOR RESTART THE SYSTEM.*\n");
+	printf("\n\t\t*ENTER CHANGE_USER_NAME FOR CHANGING USER NAME.*\n");
+	printf("\n\t\t*ENTER CHANGE_PASSWORD FOR CHANGING PASSWORD.*\n");
+	printf("\n\t\t*ENTER ADD_USER FOR ADDING NEW USER.*\n");
+	printf("\n\t\t*ENTER VIEW_PROFILE FOR VIEWING PROFILE .*\n");
+	GetCommands(IsAdmin);
+	return 0;
+}
+
+int GetStudentHelp() 
+{
+	printf("\n\t\t*ENTER VIEW_BOOK FOR VIEWING BOOK.*\n");
+	printf("\n\t\t*ENTER SEARCH_BOOK FOR SEARCHING BOOK.*\n");
+	//printf("\n\t\t*ENTER RETURN_BOOK FOR RETURNING BOOK.*\n");
+	printf("\n\t\t*ENTER LOG_OUT FOR LOGING OUT.*\n");
+	printf("\n\t\t*ENTER CLEAR FOR CLEANING CONSOL.*\n");
+	printf("\n\t\t*ENTER CHANGE_USER_NAME FOR CHANGING USER NAME.*\n");
+	printf("\n\t\t*ENTER CHANGE_PASSWORD FOR CHANGING PASSWORD.*\n");
+	printf("\n\t\t*ENTER MY_PROFILE FOR PROFILE INFORMATION.*\n");
+	COMMAND(IsAdmin);
+
+	return 0;
+}
 void userLogin(int loginAttemptRemaining)
 {
 	FILE* userFile;
-	
+	char userName[20];
+	char password[16];
 	if (loginAttemptRemaining == 0)
 	{
-		printf("\n\t\t\tYOU FINISHED YOUR CHANCE TO LOGIN.\n\n");
+		PrintLine("LOGIN CHANCE FINISHED.");
 		return;
 	}
+	printf("\n\t\tYOU HAVE %d CHANCES TO LOG IN\n\n", loginAttemptRemaining);
+	
+	printf("\t\tENTER USERNAME: ");
+	scanf("%[^\n]%*c", userName);
+	printf("\t\tENTER PASSWORD: ");
+	scanf("%[^\n]%*c", password);
+
 	userFile = fopen(USER_DATABASE, "r");
 	if (userFile)
 	{
-		
+		ReadUsersFromFile();
+		User* u = SearchUserByName(userName);
+		if (u == NULL || strcmp(u->password, password))
+		{
+			PrintLine("USERNAME/PASSWORD NOT MATCHED");
+			userLogin(--loginAttemptRemaining);
+			return;
+		}
+		if (!strcmp(u->type, "A"))
+		{
+			IsAdmin = 1;
+		}
+		else if (!strcmp(u->type, "S"))
+		{
+			IsAdmin = 0;
+		}
+		else
+		{
+			PrintLine("INVALID USER TYPE");
+			userLogin(--loginAttemptRemaining);
+			return;
+		}
+		PrintLine("YOU HAVE SUCCESFULLY LOGGED IN");
+		printf("\t\tYOUR USER ID: %s\n", u->id);
+		while (1)
+		{
+			GetCommands(IsAdmin);
+		}
 	}
 	else
 	{
-		printf("\n\n\t\t\tFILE DOSN'T FOUND.\a\a\n");
+		PrintLine("USER DATABASE NOT FOUND.");
 		return;
 	}
-
-
-
 }
