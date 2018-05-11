@@ -13,6 +13,8 @@
 #define LOGIN_ATTEMPT 3
 
 int IsAdmin = 0;
+char userName[20];
+char password[16];
 
 #pragma region Structures
 typedef struct Book {
@@ -43,7 +45,7 @@ void PrintChar(char, int);
 void PrintLine(const char*);
 void ReadBooksFromFile();
 void WriteBooksToFile();
-Book* SearchBook(const char*);
+int SearchBook(const char*);
 void AddBook(Book);
 void EditBook(const char*, const char*, const char*, const char*, const char*);
 void DeleteBook(const char*);
@@ -57,18 +59,21 @@ void ReadUsersFromFile();
 void WriteUsersToFile();
 void AddUser(User);
 User* SearchUser(const char*);
-User* SearchUserByName(const char*);
+int SearchUserByName(const char*);
 void WriteUserContent(FILE*, User);
 void EditUser(const char*, const char*, const char*, const char*, const char*);
 void DeleteUser(const char*);
 char* GetUniqueIDForUser();
 void PrintUserHeader();
 void PrintUser(User);
+User InputUser();
 void userLogin(int );
 #pragma endregion Prototypes
 
 int main()
 {
+	ReadBooksFromFile();
+	ReadUsersFromFile();
 	PrintLine("WELCOME TO LIBRARY MANAGEMENT");
 	PrintLine("-----------------------------");
 	int loginAttempRemaining = LOGIN_ATTEMPT;
@@ -199,17 +204,16 @@ void AddBook(Book b)
 	PrintLine("BOOK ADDED SUCCESSFULLY");
 }
 
-Book* SearchBook(const char* id)
+int SearchBook(const char* id)
 {
-	int found = 0;
 	for (int i = 0; i < NumberOfBooks; i++)
 	{
 		if (strcmp(id, books[i].id) == 0)
 		{
-			return &books[i];
+			return i;
 		}
 	}
-	return NULL;
+	return -1;
 }
 
 void EditBook(const char* id, const char* name, const char* authorName, const char* price, const char* issue)
@@ -306,6 +310,10 @@ Book InputBook()
 	return b;
 }
 
+void ChangeUserName();
+
+void ChangePassword();
+
 #pragma endregion Book Functions
 
 #pragma region User Functions
@@ -350,13 +358,13 @@ void AddUser(User user)
 	FILE* userFile = fopen(USER_DATABASE, "a");
 	if (!userFile)
 	{
-		printf("User Database not found");
+		PrintLine("USER DATABASE NOT FOUND");
 		return;
 	}
 	WriteUserContent(userFile, user);
-	NumberOfUsers++;
+	users[NumberOfUsers++] = user;
 	fclose(userFile);
-	printf("User Added Successfully");
+	PrintLine("USER ADDED SUCCESSFULLY");
 }
 
 User* SearchUser(const char* id)
@@ -372,17 +380,17 @@ User* SearchUser(const char* id)
 	return NULL;
 }
 
-User* SearchUserByName(const char* name)
+int SearchUserByName(const char* name)
 {
 	int found = 0;
 	for (int i = 0; i < NumberOfUsers; i++)
 	{
 		if (strcmp(name, users[i].userName) == 0)
 		{
-			return &users[i];
+			return i;
 		}
 	}
-	return NULL;
+	return -1;
 }
 
 void EditUser(const char* id, const char* userName, const char* password, const char* type, const char* borrowStatus)
@@ -499,6 +507,111 @@ void PrintUser(User u)
 	printf("%-5s", u.type);
 	printf("%s\n", u.borrowStatus);
 }
+
+User InputUser()
+{
+	User u;
+	printf("\n\t\tENTER USER NAME: ");
+	scanf("%[^\n]%*c", u.userName);
+	strcat(u.userName, "\0");
+	printf("\n\t\tENTER PASSWORD: ");
+	scanf("%[^\n]%*c", u.password);
+	strcat(u.password, "\0");
+	printf("\n\t\tENTER TYPE: ");
+	scanf("%[^\n]%*c", u.type);
+	strcat(u.type, "\0");
+	strcpy(u.borrowStatus, "NO");
+	return u;
+}
+
+void ChangeUserName()
+{
+	char oldUserName[20];
+	char newUserName[20];
+	printf("\n\t\tENTER CURRENT USER NAME: ");
+	scanf("%[^\n]%*c", oldUserName);
+	int index = SearchUserByName(oldUserName);
+	if (index == -1)
+	{
+		PrintLine("USERNAME NOT FOUND");
+		return;
+	}
+	printf("\n\t\tENTER NEW USER NAME: ");
+	scanf("%[^\n]%*c", newUserName);
+	strcpy(users[index].userName, newUserName);
+	WriteUsersToFile();
+	PrintLine("USERNAME CHANGED SUCCESSFULLY");
+}
+
+void ChangePassword()
+{
+	char oldUserName[20];
+	char oldPassword[16];
+	char newPassword[20];
+	printf("\n\t\tENTER CURRENT USER NAME: ");
+	scanf("%[^\n]%*c", oldUserName);
+	printf("\n\t\tENTER CURRENT PASSWORD: ");
+	scanf("%[^\n]%*c", oldPassword);
+	int index = SearchUserByName(oldUserName);
+	if (index == -1)
+	{
+		PrintLine("USERNAME NOT FOUND");
+		return;
+	}
+	if (strcmp(users[index].password, oldPassword))
+	{
+		PrintLine("USERNAME/PASSWORD NOT MATCHED");
+		return;
+	}
+	printf("\n\t\tENTER NEW PASSWORD:");
+	scanf("%[^\n]%*c", newPassword);
+	strcpy(users[index].password, newPassword);
+	WriteUsersToFile();
+	PrintLine("PASSWORD CHANGED SUCCESSFULLY");
+}
+
+void ViewUserProfile()
+{
+	int viewType;
+	char garbage;
+	PrintLine("WHAT YOU WANT TO VIEW:");
+	PrintLine("\tPRESS 1\"FOR ALL STUDENT PROFILE\"");
+	PrintLine("\tPRESS 2\"FOR ALL ADMIN PROFILE\"");
+	PrintLine("\tPRESS 3\"FOR MY PROFILE\" ");
+	scanf("%d%c", &viewType, &garbage);
+	PrintUserHeader();
+	switch (viewType)
+	{
+		case 1:
+			for (int i = 0; i < NumberOfUsers; i++)
+			{
+				if (!strcmp(users[i].type, "S"))
+				{
+					PrintUser(users[i]);
+				}
+			}
+			break;
+		case 2:
+			for (int i = 0; i < NumberOfUsers; i++)
+			{
+				if (!strcmp(users[i].type, "A"))
+				{
+					PrintUser(users[i]);
+				}
+			}
+			break;
+		case 3:
+			for (int i = 0; i < NumberOfUsers; i++)
+			{
+				if (!strcmp(users[i].userName, userName))
+				{
+					PrintUser(users[i]);
+					break;
+				}
+			}
+			break;
+	}
+}
 #pragma endregion User Functions
 
 int GetAdminCommands() {
@@ -545,13 +658,16 @@ int GetAdminCommands() {
 	}
 	else if (strcmp(strupr(command), "SEARCH_BOOK") == 0) 
 	{
-		//todo: Input Book Id
-		//SearchBook()
+		char* id[10];
+		printf("\n\t\tENTER BOOK ID: ");
+		scanf("%s", id);
+		PrintBookHeader();
+		int i = SearchBook(id);
+		PrintBook(books[i]);
 	}
 	else if (strcmp(strupr(command), "LOG_OUT") == 0) 
 	{
-		//todo:
-		LOG_OUT();
+		exit(1);
 	}
 	else if (strcmp(strupr(command), "RETURN_BOOK") == 0) 
 	{
@@ -560,43 +676,38 @@ int GetAdminCommands() {
 	}
 	else if (strcmp(strupr(command), "HELP") == 0) 
 	{
-		//todo:
-		HELP_FOR_ADMIN();
+		GetAdminHelp();
 	}
 	else if (strcmp(strupr(command), "CLEAR") == 0) 
 	{
-		//todo:
-		CLEAR();
+		system("cls");
 	}
 	else if (strcmp(strupr(command), "RESTART") == 0) 
 	{
-		//todo:
-		RESTART();
+		ReadBooksFromFile();
+		ReadUsersFromFile();
 	}
-	/*else if (strcmp(strupr(command), "CHANGE_USER_NAME") == 0) 
+	else if (strcmp(strupr(command), "CHANGE_USER_NAME") == 0) 
 	{
-
-		CHANGE_USER_NAME();
+		ChangeUserName();
 	}
 	else if (strcmp(strupr(command), "CHANGE_PASSWORD") == 0) 
 	{
-
-		CHANGE_PASSWORD();
-	}*/
+		ChangePassword();
+	}
 	else if (strcmp(strupr(command), "VIEW_PROFILE") == 0) 
 	{
-		//todo:
-		//VIEW_PROFILE();
+		ViewUserProfile();
 	}
 	else if (strcmp(strupr(command), "ADD_USER") == 0) 
 	{
-		//todo:
-		//ADD_USER();
+		User u = InputUser();
+		strcpy(u.id, GetUniqueIDForUser());
+		AddUser(u);
 	}
-	else {
-
-		printf("\n\t\t\tMAKE SURE YOU WRITE THE CORRECT ONE.\n\a\a");
-		//COMMAND(IS_ADMIMN_OR_STUDENT);
+	else 
+	{
+		PrintLine("Please Provide Correct Command");
 	}
 
 	return 0;
@@ -604,55 +715,62 @@ int GetAdminCommands() {
 int GetStudentCommands() {
 
 	char command[25];
-
-	printf("\n\n\nCOMMAND: ");
+	printf("\n\t\tSTUDENT COMMAND: ");
 	gets(command);
 
 	if (strcmp(strupr(command), "VIEW_BOOK") == 0) 
 	{
-
-		VIEW_BOOK();
+		PrintBookHeader();
+		ReadBooksFromFile();
+		for (int i = 0; i < NumberOfBooks; i++)
+		{
+			PrintBook(books[i]);
+		}
 	}
 	else if (strcmp(strupr(command), "SEARCH_BOOK") == 0) 
 	{
-
-		SEARCH_BOOK();
+		char* id[10];
+		printf("\n\t\tENTER BOOK ID: ");
+		scanf("%s", id);
+		PrintBookHeader();
+		int i = SearchBook(id);
+		PrintBook(books[i]);
 	}
 	else if (strcmp(strupr(command), "LOG_OUT") == 0) 
 	{
-
-		LOG_OUT();
+		exit(1);
 	}
-	/*else if(strcmp(strupr(command),"RETURN_BOOK") == 0){
-
-	RETURN_BOOK();
-	}*/
 	else if (strcmp(strupr(command), "HELP") == 0) 
 	{
-		HELP_FOR_STUDENT();
+		GetStudentHelp();
 	}
 	else if (strcmp(strupr(command), "CLEAR") == 0) 
 	{
-		CLEAR();
+		system("cls");
 	}
 	else if (strcmp(strupr(command), "CHANGE_USER_NAME") == 0) 
 	{
-		CHANGE_USER_NAME();
+		ChangeUserName();
 	}
 	else if (strcmp(strupr(command), "CHANGE_PASSWORD") == 0) 
 	{
-
-		CHANGE_PASSWORD();
+		ChangePassword();
 	}
 	else if (strcmp(strupr(command), "MY_PROFILE") == 0) 
 	{
-
-		MY_PROFILE();
+		PrintUserHeader();
+		for (int i = 0; i < NumberOfUsers; i++)
+		{
+			if (!strcmp(users[i].userName, userName))
+			{
+				PrintUser(users[i]);
+				break;
+			}
+		}
 	}
 	else 
 	{
-		printf("\n\t\t\tMAKE SURE YOU WRITE THE CORRECT ONE.\n\a\a");
-		GetCommands(IsAdmin);
+		PrintLine("Please Provide Correct Command");
 	}
 
 	return 0;
@@ -706,8 +824,6 @@ int GetStudentHelp()
 void userLogin(int loginAttemptRemaining)
 {
 	FILE* userFile;
-	char userName[20];
-	char password[16];
 	if (loginAttemptRemaining == 0)
 	{
 		PrintLine("LOGIN CHANCE FINISHED.");
@@ -724,18 +840,25 @@ void userLogin(int loginAttemptRemaining)
 	if (userFile)
 	{
 		ReadUsersFromFile();
-		User* u = SearchUserByName(userName);
-		if (u == NULL || strcmp(u->password, password))
+	    int index = SearchUserByName(userName);
+		if (index == -1 )
+		{
+			PrintLine("USERNAME NOT FOUND");
+			userLogin(--loginAttemptRemaining);
+			return;
+		}
+		User u = users[index];
+		if (strcmp(u.password, password))
 		{
 			PrintLine("USERNAME/PASSWORD NOT MATCHED");
 			userLogin(--loginAttemptRemaining);
 			return;
 		}
-		if (!strcmp(u->type, "A"))
+		if (!strcmp(u.type, "A"))
 		{
 			IsAdmin = 1;
 		}
-		else if (!strcmp(u->type, "S"))
+		else if (!strcmp(u.type, "S"))
 		{
 			IsAdmin = 0;
 		}
@@ -746,7 +869,8 @@ void userLogin(int loginAttemptRemaining)
 			return;
 		}
 		PrintLine("YOU HAVE SUCCESFULLY LOGGED IN");
-		printf("\t\tYOUR USER ID: %s\n", u->id);
+		PrintLine("Type HELP FOR SEEING AVAILABLE COMMANDS");
+		printf("\t\tYOUR USER ID: %s\n", u.id);
 		while (1)
 		{
 			GetCommands(IsAdmin);

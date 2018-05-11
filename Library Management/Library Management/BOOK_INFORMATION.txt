@@ -1,2 +1,1 @@
-B-7|Test|WOW|10|NO
-
+B-7|Test1|Wow1|20|NO
